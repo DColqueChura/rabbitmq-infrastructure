@@ -1,0 +1,4 @@
+*.bak
+mnesia/
+logs/
+.erlang.cookie
