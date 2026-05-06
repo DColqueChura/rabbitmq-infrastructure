@@ -90,7 +90,7 @@ else
     cp "$RABBITMQ_CONFIG_FILE" "$RABBITMQ_CONFIG_FILE.bak"
     # Update or add the load_definitions line
     if grep -q "load_definitions" "$RABBITMQ_CONFIG_FILE"; then
-        sed -i '' "s|load_definitions.*|load_definitions = $DEFINITIONS_FILE|" "$RABBITMQ_CONFIG_FILE"
+        sed -i.bak "s|load_definitions.*|load_definitions = $DEFINITIONS_FILE|" "$RABBITMQ_CONFIG_FILE"
     else
         echo "load_definitions = $DEFINITIONS_FILE" >> "$RABBITMQ_CONFIG_FILE"
     fi
@@ -142,7 +142,7 @@ echo "Definitions file verified: $DEFINITIONS_FILE"
 echo "Enabling plugins offline..."
 # Note: No sudo needed for plugin management when running as user
 RABBITMQ_ENABLED_PLUGINS_FILE="$RABBITMQ_ENABLED_PLUGINS_FILE" \
-    rabbitmq-plugins --offline --node "$NODE_NAME" enable rabbitmq_management rabbitmq_stream
+    sudo rabbitmq-plugins --offline --node "$NODE_NAME" enable rabbitmq_management rabbitmq_stream
 
 # Final cookie permission check before starting
 echo "Final cookie permission check:"
@@ -158,4 +158,4 @@ touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writ
 rm -f "$INSTANCE_DIR/logs/test_write"
 
 # Start the server (no sudo)
-rabbitmq-server
+sudo rabbitmq-server
