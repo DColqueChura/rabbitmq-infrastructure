@@ -142,7 +142,10 @@ echo "Definitions file verified: $DEFINITIONS_FILE"
 echo "Enabling plugins offline..."
 # Note: No sudo needed for plugin management when running as user
 RABBITMQ_ENABLED_PLUGINS_FILE="$RABBITMQ_ENABLED_PLUGINS_FILE" \
-    sudo rabbitmq-plugins --offline --node "$NODE_NAME" enable rabbitmq_management rabbitmq_stream
+    sudo \
+    RABBITMQ_ENABLED_PLUGINS_FILE="$INSTANCE_DIR/rabbitmq-conf/enabled_plugins" \
+    HOME="$INSTANCE_DIR" \
+    rabbitmq-plugins --offline --node "$NODE_NAME" enable rabbitmq_management rabbitmq_stream
 
 # Final cookie permission check before starting
 echo "Final cookie permission check:"
@@ -158,4 +161,12 @@ touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writ
 rm -f "$INSTANCE_DIR/logs/test_write"
 
 # Start the server (no sudo)
-sudo rabbitmq-server
+sudo \
+    RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
+    RABBITMQ_ENABLED_PLUGINS_FILE="$INSTANCE_DIR/rabbitmq-conf/enabled_plugins" \
+    RABBITMQ_MNESIA_BASE="$INSTANCE_DIR/mnesia" \
+    RABBITMQ_LOG_BASE="$INSTANCE_DIR/logs" \
+    RABBITMQ_NODENAME="$NODE_NAME" \
+    RABBITMQ_DIST_PORT="$DIST_PORT" \
+    HOME="$INSTANCE_DIR" \
+    rabbitmq-server
