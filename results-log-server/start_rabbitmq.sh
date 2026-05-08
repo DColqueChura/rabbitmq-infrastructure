@@ -181,9 +181,8 @@ chmod 600 "$COOKIE_FILE"
 
 echo "Iniciando servidor como usuario $CURRENT_USER (SIN SUDO)..."
 
-# 3. Usamos sudo -E para PRESERVAR las variables de entorno de mi usuario y evitar problemas de permisos 
+# Ejecutamos el servidor directamente con tu usuario
 # Start the server
-#sudo -E \
 RABBITMQ_PID_FILE="$INSTANCE_DIR/mnesia/rabbitmq.pid" \
 RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
 RABBITMQ_ENABLED_PLUGINS_FILE="$INSTANCE_DIR/rabbitmq-conf/enabled_plugins" \
