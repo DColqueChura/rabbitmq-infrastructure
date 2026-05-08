@@ -1,7 +1,17 @@
 #!/bin/bash
 
-# Results Log Server RabbitMQ Startup Script (User Mode)
-# This script starts a dedicated RabbitMQ instance for the results log server as the current user
+# ==============================================================================
+# RabbitMQ Startup Script (Multi-Instance & Universal Mode)
+# ==============================================================================
+# Original: Dedicated instance for the results-log-server as the current user.
+#
+# COMPATIBILITY NOTE:
+# This script is system-agnostic (fully compatible with WSL, Linux, and macOS).
+# It executes RabbitMQ in pure User Mode to prevent Root permission conflicts
+# and enables the coexistence of multiple nodes through:
+#   1. Environment variable isolation (dedicated HOME and MNESIA_BASE).
+#   2. Selective process cleanup by NODENAME.
+# ==============================================================================
 
 set -e  # Exit on error
 
@@ -160,9 +170,9 @@ echo "========================================="
 touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writable" || echo "Log directory is NOT writable"
 rm -f "$INSTANCE_DIR/logs/test_write"
 
-echo "Realizando limpieza de procesos previos..."
-sudo pkill -9 -u root beam.smp || true
-sudo pkill -9 -u alana beam.smp || true
+echo "Realizando limpieza de procesos previos para este nodo..."
+# Buscamos el proceso que tenga el nombre de este nodo específico
+ps aux | grep "rabbitmq" | grep "nodename $NODE_NAME" | awk '{print $2}' | xargs kill -9 2>/dev/null || true
 
 # Detectamos el usuario actual de forma dinámica
 CURRENT_USER=$(whoami)
@@ -172,7 +182,6 @@ echo "Ajustando permisos para el usuario: $CURRENT_USER:$CURRENT_GROUP"
 
 # 1. Aseguramos propiedad (Universal para WSL y Mac)
 sudo chown -R $CURRENT_USER:$CURRENT_GROUP "$INSTANCE_DIR"
-
 
 # Aplicamos permisos agresivos (775 para carpetas para que root y alana convivan)
 chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia debe ser privado para el usuario
