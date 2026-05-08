@@ -183,7 +183,7 @@ echo "Ajustando permisos para el usuario: $CURRENT_USER:$CURRENT_GROUP"
 # 1. Aseguramos propiedad (Universal para WSL y Mac)
 sudo chown -R $CURRENT_USER:$CURRENT_GROUP "$INSTANCE_DIR"
 
-# Aplicamos permisos agresivos (775 para carpetas para que root y alana convivan)
+# Aplicamos permisos agresivos (700 para carpetas para que solo el usuario tenga acceso)
 chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia debe ser privado para el usuario
 chmod -R 700 "$INSTANCE_DIR/logs"
 chmod 600 "$COOKIE_FILE"
