@@ -160,9 +160,14 @@ echo "========================================="
 touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writable" || echo "Log directory is NOT writable"
 rm -f "$INSTANCE_DIR/logs/test_write"
 
-# Asegurar que las carpetas tengan permisos de escritura para el proceso sudo
-sudo chmod -R 777 "$INSTANCE_DIR/mnesia"
-sudo chmod -R 777 "$INSTANCE_DIR/logs"
+# Agrega el cookie al chown para evitar errores de autenticación de Erlang
+sudo chown $(id -u):$(id -g) "$COOKIE_FILE"
+
+# Damos propiedad al usuario actual
+sudo chown -R $(id -u):$(id -g) "$INSTANCE_DIR/mnesia" "$INSTANCE_DIR/logs"
+chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia debe ser privado para el usuario
+chmod -R 755 "$INSTANCE_DIR/logs"
+chmod 400 "$COOKIE_FILE"
 
 # Start the server (no sudo)
 sudo \
