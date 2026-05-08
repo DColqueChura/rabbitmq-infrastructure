@@ -160,22 +160,39 @@ echo "========================================="
 touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writable" || echo "Log directory is NOT writable"
 rm -f "$INSTANCE_DIR/logs/test_write"
 
-# Agrega el cookie al chown para evitar errores de autenticación de Erlang
-sudo chown $(id -u):$(id -g) "$COOKIE_FILE"
+echo "Realizando limpieza de procesos previos..."
+sudo pkill -9 -u root beam.smp || true
+sudo pkill -9 -u alana beam.smp || true
 
-# Damos propiedad al usuario actual
-sudo chown -R $(id -u):$(id -g) "$INSTANCE_DIR/mnesia" "$INSTANCE_DIR/logs"
+# Detectamos el usuario actual de forma dinámica
+CURRENT_USER=$(whoami)
+CURRENT_GROUP=$(id -gn) # Obtiene el grupo principal (staff en Mac, alana en Linux)
+
+echo "Ajustando permisos para el usuario: $CURRENT_USER:$CURRENT_GROUP"
+
+# 1. Aseguramos propiedad (Universal para WSL y Mac)
+sudo chown -R $CURRENT_USER:$CURRENT_GROUP "$INSTANCE_DIR"
+
+
+# Aplicamos permisos agresivos (775 para carpetas para que root y alana convivan)
 chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia debe ser privado para el usuario
-chmod -R 755 "$INSTANCE_DIR/logs"
-chmod 400 "$COOKIE_FILE"
+chmod -R 700 "$INSTANCE_DIR/logs"
+chmod 600 "$COOKIE_FILE"
 
-# Start the server (no sudo)
-sudo \
-    RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
-    RABBITMQ_ENABLED_PLUGINS_FILE="$INSTANCE_DIR/rabbitmq-conf/enabled_plugins" \
-    RABBITMQ_MNESIA_BASE="$INSTANCE_DIR/mnesia" \
-    RABBITMQ_LOG_BASE="$INSTANCE_DIR/logs" \
-    RABBITMQ_NODENAME="$NODE_NAME" \
-    RABBITMQ_DIST_PORT="$DIST_PORT" \
-    HOME="$INSTANCE_DIR" \
-    rabbitmq-server
+echo "Iniciando servidor como usuario $CURRENT_USER (SIN SUDO)..."
+
+# 3. Usamos sudo -E para PRESERVAR las variables de entorno de mi usuario y evitar problemas de permisos 
+# Start the server
+#sudo -E \
+RABBITMQ_PID_FILE="$INSTANCE_DIR/mnesia/rabbitmq.pid" \
+RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
+RABBITMQ_ENABLED_PLUGINS_FILE="$INSTANCE_DIR/rabbitmq-conf/enabled_plugins" \
+RABBITMQ_MNESIA_BASE="$INSTANCE_DIR/mnesia" \
+RABBITMQ_LOG_BASE="$INSTANCE_DIR/logs" \
+RABBITMQ_NODENAME="$NODE_NAME" \
+RABBITMQ_DIST_PORT="$DIST_PORT" \
+HOME="$INSTANCE_DIR" \
+rabbitmq-server
+
+
+
