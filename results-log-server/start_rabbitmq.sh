@@ -160,6 +160,10 @@ echo "========================================="
 touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writable" || echo "Log directory is NOT writable"
 rm -f "$INSTANCE_DIR/logs/test_write"
 
+# Asegurar que las carpetas tengan permisos de escritura para el proceso sudo
+sudo chmod -R 777 "$INSTANCE_DIR/mnesia"
+sudo chmod -R 777 "$INSTANCE_DIR/logs"
+
 # Start the server (no sudo)
 sudo \
     RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
