@@ -170,27 +170,27 @@ echo "========================================="
 touch "$INSTANCE_DIR/logs/test_write" 2>/dev/null && echo "Log directory is writable" || echo "Log directory is NOT writable"
 rm -f "$INSTANCE_DIR/logs/test_write"
 
-echo "Realizando limpieza de procesos previos para este nodo..."
-# Buscamos el proceso que tenga el nombre de este nodo específico
+echo "Cleaning up previous processes for this node..."
+# Look for the process that has this specific node name
 ps aux | grep "rabbitmq" | grep "nodename $NODE_NAME" | awk '{print $2}' | xargs kill -9 2>/dev/null || true
 
-# Detectamos el usuario actual de forma dinámica
+# Detect current user dynamically
 CURRENT_USER=$(whoami)
-CURRENT_GROUP=$(id -gn) # Obtiene el grupo principal (staff en Mac, alana en Linux)
+CURRENT_GROUP=$(id -gn) # Gets the primary group (staff on Mac, alana on Linux)
 
-echo "Ajustando permisos para el usuario: $CURRENT_USER:$CURRENT_GROUP"
+echo "Adjusting permissions for user: $CURRENT_USER:$CURRENT_GROUP"
 
-# 1. Aseguramos propiedad (Universal para WSL y Mac)
+# 1. Ensure ownership (Universal for WSL and Mac)
 sudo chown -R $CURRENT_USER:$CURRENT_GROUP "$INSTANCE_DIR"
 
-# Aplicamos permisos agresivos (700 para carpetas para que solo el usuario tenga acceso)
-chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia debe ser privado para el usuario
+# Apply aggressive permissions (700 for folders so only the user has access)
+chmod -R 700 "$INSTANCE_DIR/mnesia" # Mnesia must be private to the user
 chmod -R 700 "$INSTANCE_DIR/logs"
 chmod 600 "$COOKIE_FILE"
 
-echo "Iniciando servidor como usuario $CURRENT_USER (SIN SUDO)..."
+echo "Starting server as user $CURRENT_USER (WITHOUT SUDO)..."
 
-# Ejecutamos el servidor directamente con tu usuario
+# Execute the server directly with your user
 # Start the server
 RABBITMQ_PID_FILE="$INSTANCE_DIR/mnesia/rabbitmq.pid" \
 RABBITMQ_CONFIG_FILE="$INSTANCE_DIR/rabbitmq-conf/rabbitmq.conf" \
