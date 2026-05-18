@@ -9,12 +9,12 @@ name = "rt-monitor-rabbitmq-infrastructure-example"
         retry_delay = 3
         name = "events_exchange"
         type = "fanout"
-    [exchanges.results_log]
+    [exchanges.analysis_results]
         host = "localhost"
         port = 5673
         user = "guest"
         password = "guest"
         connection_attempts = 5
         retry_delay = 3
-        name = "results_log_exchange"
+        name = "analysis_results_exchange"
         type = "fanout"
