@@ -1,0 +1,42 @@
+networks:
+  rabbitmq-network:
+    external: true
+
+services:
+  event-server-service:
+    image: rabbitmq:3.13-management
+    container_name: events-server-container
+    hostname: events-server
+    networks:
+      - rabbitmq-network
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      - "5552:5552"
+      - "25672:25672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - events-server-data:/var/lib/rabbitmq
+
+  analysis-server-service:
+    image: rabbitmq:3.13-management
+    container_name: analysis-server-container
+    hostname: analysis-server
+    networks:
+      - rabbitmq-network
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+      - "5553:5552"
+      - "25673:25672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - analysis-server-data:/var/lib/rabbitmq
+
+volumes:
+  events-server-data:
+  analysis-server-data:
