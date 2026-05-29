@@ -3,7 +3,7 @@
 # ==============================================================================
 # RabbitMQ Startup Script (Multi-Instance & Universal Mode)
 # ==============================================================================
-# Original: Dedicated instance for the analysis-results-server as the current user.
+# Original: Dedicated instance for the analysis-server as the current user.
 #
 # COMPATIBILITY NOTE:
 # This script is system-agnostic (fully compatible with WSL, Linux, and macOS).
@@ -16,9 +16,9 @@
 set -e  # Exit on error
 
 # Server-specific configuration
-SERVER_NAME="analysis-results-server"
+SERVER_NAME="analysis-server"
 INSTANCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NODE_NAME="analysis-results-server"
+NODE_NAME="analysis-server"
 COOKIE_FILE="$INSTANCE_DIR/.erlang.cookie"
 
 # Port configuration (matching rabbitmq.conf)
@@ -80,7 +80,7 @@ DEFINITIONS_FILE="$INSTANCE_DIR/rabbitmq-conf/definitions.json"
 if [ ! -f "$RABBITMQ_CONFIG_FILE" ]; then
     echo "Creating default configuration file..."
     cat > "$RABBITMQ_CONFIG_FILE" << EOF
-# Configuration for analysis-results-server
+# Configuration for analysis-server
 listeners.tcp.default = $AMQP_PORT
 management.tcp.port = $MANAGEMENT_PORT
 stream.listeners.tcp.1 = $STREAM_PORT

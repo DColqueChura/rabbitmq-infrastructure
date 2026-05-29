@@ -1,0 +1,20 @@
+name = "rabbitmq-infrastructure"
+[exchanges]
+    [exchanges.events]
+        host = "events-server"
+        port = 5672
+        user = "guest"
+        password = "guest"
+        connection_attempts = 5
+        retry_delay = 3
+        name = "events_exchange"
+        type = "fanout"
+    [exchanges.analysis_results]
+        host = "analysis-server"
+        port = 5672
+        user = "guest"
+        password = "guest"
+        connection_attempts = 5
+        retry_delay = 3
+        name = "analysis_results_exchange"
+        type = "fanout"

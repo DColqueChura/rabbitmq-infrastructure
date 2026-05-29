@@ -1,7 +1,7 @@
-name = "rt-monitor-rabbitmq-infrastructure-example"
+name = "rabbitmq-infrastructure"
 [exchanges]
     [exchanges.events]
-        host = "localhost"
+        host = "events-server.local"
         port = 5672
         user = "guest"
         password = "guest"
@@ -10,7 +10,7 @@ name = "rt-monitor-rabbitmq-infrastructure-example"
         name = "events_exchange"
         type = "fanout"
     [exchanges.analysis_results]
-        host = "localhost"
+        host = "analysis-server.local"
         port = 5673
         user = "guest"
         password = "guest"
